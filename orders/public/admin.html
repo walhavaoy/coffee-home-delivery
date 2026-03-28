@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orders Admin</title>
+<style>
+:root {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-hover: #334155;
+  --border: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-dim: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #22c55e;
+  --success-bg: rgba(34, 197, 94, 0.15);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  --info: #3b82f6;
+  --info-bg: rgba(59, 130, 246, 0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  min-height: 100vh;
+}
+
+.header {
+  background: var(--bg-secondary);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.live-badge {
+  background: var(--success);
+  color: var(--text-primary);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.last-updated {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.refresh-btn {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.refresh-btn:hover,
+.refresh-btn:focus {
+  background: var(--accent);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.filter-select {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.search-input {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  min-width: 14rem;
+}
+
+.search-input::placeholder { color: var(--text-muted); }
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.order-count {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.table-wrap {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th[data-sort] {
+  cursor: pointer;
+  user-select: none;
+}
+
+th[data-sort]:hover {
+  color: var(--text-primary);
+}
+
+.sort-arrow {
+  display: inline-block;
+  margin-left: 0.25rem;
+  font-size: 0.625rem;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--bg-primary);
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr:hover td { background: var(--bg-hover); }
+
+.order-id {
+  font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.8125rem;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.order-id:hover { text-decoration: underline; }
+
+.items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.item-tag {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-pending { background: var(--warning-bg); color: var(--warning); }
+.status-confirmed { background: var(--info-bg); color: var(--info); }
+.status-preparing { background: var(--info-bg); color: var(--info); }
+.status-delivering { background: var(--success-bg); color: var(--success); }
+.status-delivered { background: var(--success-bg); color: var(--success); }
+.status-cancelled { background: var(--danger-bg); color: var(--danger); }
+
+.status-select {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.status-select:focus { outline: none; border-color: var(--accent); }
+.status-select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.timestamp {
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.empty-row td {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.empty-row:hover td { background: transparent; }
+
+.loading-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.spinner {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-bottom: 0.5rem;
+}
+
+.error-banner {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.error-banner.visible {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.error-dismiss {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 0.25rem;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.visible { display: flex; }
+
+.modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  max-width: 28rem;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.modal-close:hover,
+.modal-close:focus { color: var(--text-primary); outline: none; }
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--bg-primary);
+}
+
+.detail-row:last-child { border-bottom: none; }
+
+.detail-label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.detail-value {
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+  max-width: 60%;
+  word-break: break-word;
+}
+
+@media (max-width: 640px) {
+  .summary-cards { grid-template-columns: repeat(2, 1fr); }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .search-input { min-width: 0; width: 100%; }
+  .order-count { margin-left: 0; }
+  td, th { padding: 0.5rem 0.75rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="header" data-testid="admin-container-header">
+  <div class="header-left">
+    <h1 data-testid="admin-heading-title">Orders Admin</h1>
+    <span class="live-badge" data-testid="admin-badge-live">Live</span>
+  </div>
+  <div class="header-right">
+    <span class="last-updated" data-testid="admin-text-lastUpdated"></span>
+    <button class="refresh-btn" data-action="refresh" data-testid="admin-button-refresh" aria-label="Refresh orders" tabindex="0">Refresh</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="error-banner" id="error-banner" role="alert" data-testid="admin-alert-error">
+    <span id="error-message" data-testid="admin-text-errorMessage"></span>
+    <button class="error-dismiss" data-action="dismiss-error" aria-label="Dismiss error" tabindex="0">&times;</button>
+  </div>
+
+  <div class="summary-cards" data-testid="admin-container-summary">
+    <div class="summary-card">
+      <div class="summary-label">Total Orders</div>
+      <div class="summary-value" data-testid="admin-value-total">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Pending</div>
+      <div class="summary-value" data-testid="admin-value-pending">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Preparing</div>
+      <div class="summary-value" data-testid="admin-value-preparing">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Delivering</div>
+      <div class="summary-value" data-testid="admin-value-delivering">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Delivered</div>
+      <div class="summary-value" data-testid="admin-value-delivered">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Cancelled</div>
+      <div class="summary-value" data-testid="admin-value-cancelled">0</div>
+    </div>
+  </div>
+
+  <div class="toolbar" data-testid="admin-container-toolbar">
+    <div class="filter-group">
+      <label class="filter-label" for="status-filter">Status:</label>
+      <select class="filter-select" id="status-filter" data-testid="admin-select-statusFilter">
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="preparing">Preparing</option>
+        <option value="delivering">Delivering</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+    <input type="text" class="search-input" id="search-input" placeholder="Search by customer or order ID..." data-testid="admin-input-search" aria-label="Search orders">
+    <span class="order-count" data-testid="admin-text-orderCount"></span>
+  </div>
+
+  <div class="table-wrap" data-testid="admin-container-table">
+    <table data-testid="admin-table-orders" role="grid">
+      <thead>
+        <tr>
+          <th data-sort="id">Order ID <span class="sort-arrow"></span></th>
+          <th data-sort="customerName">Customer <span class="sort-arrow"></span></th>
+          <th>Items</th>
+          <th data-sort="status">Status <span class="sort-arrow"></span></th>
+          <th>Action</th>
+          <th data-sort="createdAt">Created <span class="sort-arrow"></span></th>
+          <th data-sort="updatedAt">Updated <span class="sort-arrow"></span></th>
+        </tr>
+      </thead>
+      <tbody id="orders-body" data-testid="admin-container-ordersBody">
+        <tr class="empty-row"><td colspan="7"><div class="loading-state"><div class="spinner"></div><div>Loading orders...</div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="detail-modal" role="dialog" aria-modal="true" aria-label="Order details" data-testid="admin-modal-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" data-testid="admin-heading-modalTitle">Order Details</span>
+      <button class="modal-close" data-action="close-modal" aria-label="Close" tabindex="0">&times;</button>
+    </div>
+    <div id="detail-body" data-testid="admin-container-modalBody"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STATUSES = ['pending', 'confirmed', 'preparing', 'delivering', 'delivered', 'cancelled'];
+  var POLL_INTERVAL = 5000;
+
+  var allOrders = [];
+  var sortField = 'createdAt';
+  var sortAsc = false;
+  var modalOpen = false;
+
+  var tbody = document.getElementById('orders-body');
+  var errorBanner = document.getElementById('error-banner');
+  var errorMessage = document.getElementById('error-message');
+  var statusFilter = document.getElementById('status-filter');
+  var searchInput = document.getElementById('search-input');
+  var detailModal = document.getElementById('detail-modal');
+  var detailBody = document.getElementById('detail-body');
+  var lastUpdatedEl = document.querySelector('[data-testid="admin-text-lastUpdated"]');
+  var orderCountEl = document.querySelector('[data-testid="admin-text-orderCount"]');
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
+  function formatTime(iso) {
+    try {
+      var d = new Date(iso);
+      return d.toLocaleString(undefined, {
+        month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    } catch (e) {
+      return escapeHtml(iso);
+    }
+  }
+
+  function statusClass(status) {
+    return 'status-badge status-' + status;
+  }
+
+  function updateSummary() {
+    var counts = {};
+    for (var i = 0; i < STATUSES.length; i++) {
+      counts[STATUSES[i]] = 0;
+    }
+    for (var j = 0; j < allOrders.length; j++) {
+      var s = allOrders[j].status;
+      if (counts[s] !== undefined) {
+        counts[s]++;
+      }
+    }
+    document.querySelector('[data-testid="admin-value-total"]').textContent = String(allOrders.length);
+    document.querySelector('[data-testid="admin-value-pending"]').textContent = String(counts.pending || 0);
+    document.querySelector('[data-testid="admin-value-preparing"]').textContent = String(counts.preparing || 0);
+    document.querySelector('[data-testid="admin-value-delivering"]').textContent = String(counts.delivering || 0);
+    document.querySelector('[data-testid="admin-value-delivered"]').textContent = String(counts.delivered || 0);
+    document.querySelector('[data-testid="admin-value-cancelled"]').textContent = String(counts.cancelled || 0);
+  }
+
+  function getFilteredOrders() {
+    var filterStatus = statusFilter.value;
+    var query = searchInput.value.trim().toLowerCase();
+    var result = [];
+
+    for (var i = 0; i < allOrders.length; i++) {
+      var o = allOrders[i];
+      if (filterStatus && o.status !== filterStatus) continue;
+      if (query) {
+        var haystack = (o.id + ' ' + o.customerName).toLowerCase();
+        if (haystack.indexOf(query) === -1) continue;
+      }
+      result.push(o);
+    }
+
+    result.sort(function (a, b) {
+      var av = a[sortField] || '';
+      var bv = b[sortField] || '';
+      if (av < bv) return sortAsc ? -1 : 1;
+      if (av > bv) return sortAsc ? 1 : -1;
+      return 0;
+    });
+
+    return result;
+  }
+
+  function renderTable() {
+    var filtered = getFilteredOrders();
+    orderCountEl.textContent = 'Showing ' + filtered.length + ' of ' + allOrders.length;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No orders match the current filter.</td></tr>';
+      updateSortArrows();
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < filtered.length; i++) {
+      var o = filtered[i];
+      var shortId = escapeHtml(o.id.length > 8 ? o.id.slice(0, 8) : o.id);
+
+      var items = o.items || [];
+      var itemsHtml = '<div class="items-list">';
+      for (var k = 0; k < items.length; k++) {
+        itemsHtml += '<span class="item-tag">' + escapeHtml(items[k]) + '</span>';
+      }
+      itemsHtml += '</div>';
+
+      var selectHtml = '<select class="status-select" data-order-id="' + escapeHtml(o.id) + '" '
+        + 'data-testid="admin-select-status-' + escapeHtml(o.id.slice(0, 8)) + '" '
+        + 'aria-label="Change status for order ' + shortId + '">';
+      for (var s = 0; s < STATUSES.length; s++) {
+        selectHtml += '<option value="' + STATUSES[s] + '"'
+          + (STATUSES[s] === o.status ? ' selected' : '')
+          + '>' + STATUSES[s] + '</option>';
+      }
+      selectHtml += '</select>';
+
+      html += '<tr data-testid="admin-row-order-' + escapeHtml(o.id.slice(0, 8)) + '">'
+        + '<td><span class="order-id" data-action="view-detail" data-order-id="' + escapeHtml(o.id) + '" '
+        + 'data-testid="admin-link-orderId-' + escapeHtml(o.id.slice(0, 8)) + '" '
+        + 'tabindex="0" role="button" aria-label="View order ' + shortId + '">'
+        + shortId + '</span></td>'
+        + '<td>' + escapeHtml(o.customerName) + '</td>'
+        + '<td>' + itemsHtml + '</td>'
+        + '<td><span class="' + statusClass(o.status) + '">' + escapeHtml(o.status) + '</span></td>'
+        + '<td>' + selectHtml + '</td>'
+        + '<td class="timestamp">' + formatTime(o.createdAt) + '</td>'
+        + '<td class="timestamp">' + formatTime(o.updatedAt) + '</td>'
+        + '</tr>';
+    }
+
+    tbody.innerHTML = html;
+    updateSortArrows();
+  }
+
+  function updateSortArrows() {
+    var ths = document.querySelectorAll('th[data-sort]');
+    for (var i = 0; i < ths.length; i++) {
+      var arrow = ths[i].querySelector('.sort-arrow');
+      if (ths[i].getAttribute('data-sort') === sortField) {
+        arrow.textContent = sortAsc ? '\u25B2' : '\u25BC';
+      } else {
+        arrow.textContent = '';
+      }
+    }
+  }
+
+  function showError(msg) {
+    errorMessage.textContent = msg;
+    errorBanner.classList.add('visible');
+  }
+
+  function hideError() {
+    errorBanner.classList.remove('visible');
+  }
+
+  function loadOrders() {
+    fetch('/api/orders').then(function (resp) {
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      return resp.json();
+    }).then(function (data) {
+      allOrders = Array.isArray(data) ? data : (data.orders || []);
+      updateSummary();
+      if (!modalOpen) {
+        renderTable();
+      }
+      hideError();
+      lastUpdatedEl.textContent = 'Updated ' + new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }).catch(function (err) {
+      showError('Failed to load orders: ' + err.message);
+    });
+  }
+
+  function updateStatus(orderId, newStatus, selectEl) {
+    selectEl.disabled = true;
+    fetch('/api/orders/' + encodeURIComponent(orderId), {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    }).then(function (resp) {
+      if (!resp.ok) return resp.json().then(function (b) { throw new Error(b.error || 'Update failed'); });
+      return resp.json();
+    }).then(function () {
+      loadOrders();
+    }).catch(function (err) {
+      showError('Failed to update order: ' + err.message);
+      selectEl.disabled = false;
+    });
+  }
+
+  function showDetail(orderId) {
+    var order = null;
+    for (var i = 0; i < allOrders.length; i++) {
+      if (allOrders[i].id === orderId) { order = allOrders[i]; break; }
+    }
+    if (!order) return;
+
+    var items = (order.items || []).map(function (item) { return escapeHtml(item); }).join(', ');
+
+    var html = '<div class="detail-row"><span class="detail-label">Order ID</span><span class="detail-value" data-testid="admin-text-detailId">' + escapeHtml(order.id) + '</span></div>'
+      + '<div class="detail-row"><span class="detail-label">Customer</span><span class="detail-value" data-testid="admin-text-detailCustomer">' + escapeHtml(order.customerName) + '</span></div>'
+      + '<div class="detail-row"><span class="detail-label">Items</span><span class="detail-value" data-testid="admin-text-detailItems">' + (items || 'None') + '</span></div>'
+      + '<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="' + statusClass(order.status) + '">' + escapeHtml(order.status) + '</span></span></div>'
+      + '<div class="detail-row"><span class="detail-label">Created</span><span class="detail-value" data-testid="admin-text-detailCreated">' + formatTime(order.createdAt) + '</span></div>'
+      + '<div class="detail-row"><span class="detail-label">Updated</span><span class="detail-value" data-testid="admin-text-detailUpdated">' + formatTime(order.updatedAt) + '</span></div>';
+
+    detailBody.innerHTML = html;
+    modalOpen = true;
+    detailModal.classList.add('visible');
+    detailModal.querySelector('.modal-close').focus();
+  }
+
+  function closeModal() {
+    modalOpen = false;
+    detailModal.classList.remove('visible');
+  }
+
+  document.addEventListener('click', function (e) {
+    var target = e.target.closest('[data-action]');
+    if (target) {
+      var action = target.getAttribute('data-action');
+      if (action === 'refresh') { loadOrders(); return; }
+      if (action === 'dismiss-error') { hideError(); return; }
+      if (action === 'view-detail') { showDetail(target.getAttribute('data-order-id')); return; }
+      if (action === 'close-modal') { closeModal(); return; }
+    }
+    if (e.target === detailModal) { closeModal(); }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modalOpen) { closeModal(); return; }
+    var target = e.target.closest('[data-action="view-detail"]');
+    if (target && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      showDetail(target.getAttribute('data-order-id'));
+    }
+  });
+
+  document.addEventListener('change', function (e) {
+    var sel = e.target.closest('.status-select');
+    if (!sel) return;
+    updateStatus(sel.getAttribute('data-order-id'), sel.value, sel);
+  });
+
+  document.addEventListener('click', function (e) {
+    var th = e.target.closest('th[data-sort]');
+    if (!th) return;
+    var field = th.getAttribute('data-sort');
+    if (field === sortField) { sortAsc = !sortAsc; }
+    else { sortField = field; sortAsc = true; }
+    renderTable();
+  });
+
+  statusFilter.addEventListener('change', function () { renderTable(); });
+  searchInput.addEventListener('input', function () { renderTable(); });
+
+  detailModal.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab') return;
+    var focusable = detailModal.querySelectorAll('button, [tabindex="0"]');
+    if (focusable.length === 0) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  loadOrders();
+  setInterval(loadOrders, POLL_INTERVAL);
+})();
+</script>
+</body>
+</html>
