@@ -173,8 +173,16 @@ describe('Orders API', () => {
   });
 
   describe('GET /', () => {
-    it('serves the shop HTML page', async () => {
+    it('serves the landing page', async () => {
       const res = await request(app).get('/');
+      expect(res.status).toBe(200);
+      expect(res.headers['content-type']).toMatch(/html/);
+    });
+  });
+
+  describe('GET /shop', () => {
+    it('serves the shop HTML page', async () => {
+      const res = await request(app).get('/shop');
       expect(res.status).toBe(200);
       expect(res.headers['content-type']).toMatch(/html/);
     });

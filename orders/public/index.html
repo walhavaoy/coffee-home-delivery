@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coffee Home Delivery</title>
+<style>
+:root {
+  --bg-primary: #2c1a0e;
+  --bg-secondary: #3d2815;
+  --bg-hover: #4e3620;
+  --border: #5a4230;
+  --text-primary: #faf3eb;
+  --text-secondary: #e0cdb8;
+  --text-dim: #b8a08a;
+  --text-muted: #8a7060;
+  --accent: #c67c3b;
+  --accent-hover: #a86528;
+  --success: #7dae5a;
+  --success-bg: rgba(125, 174, 90, 0.15);
+  --danger: #d45d47;
+  --danger-bg: rgba(212, 93, 71, 0.15);
+  --warning: #d4a24e;
+  --warning-bg: rgba(212, 162, 78, 0.15);
+  --cream: #f5e6d3;
+  --cream-bg: rgba(245, 230, 211, 0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--bg-secondary);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.header nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  background: var(--accent);
+  color: var(--text-primary);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.125rem;
+  color: var(--text-dim);
+  max-width: 32rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: var(--accent-hover);
+  outline: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 0.75rem 2rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--text-dim);
+  outline: none;
+}
+
+.features {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+.feature-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: border-color 0.15s;
+}
+
+.feature-card:hover {
+  border-color: var(--accent);
+}
+
+.feature-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.feature-desc {
+  font-size: 0.875rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+  .header { flex-wrap: wrap; gap: 0.75rem; }
+  .hero-title { font-size: 1.75rem; }
+  .hero-subtitle { font-size: 1rem; }
+  .features { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header" data-testid="index-container-header">
+  <h1 data-testid="index-heading-title">Coffee Home Delivery</h1>
+  <nav>
+    <a class="nav-link" href="/shop" data-testid="index-link-shop">Order Now</a>
+    <a class="nav-link" href="/admin" data-testid="index-link-admin">Admin</a>
+  </nav>
+</div>
+
+<div class="hero" data-testid="index-section-hero">
+  <h2 class="hero-title" data-testid="index-heading-hero">Fresh Coffee, Delivered to Your Door</h2>
+  <p class="hero-subtitle" data-testid="index-text-heroSubtitle">
+    Browse our handcrafted selection of coffees, teas, fresh-baked goods, and juices.
+    Order online and enjoy the warmth of your favourite cafe at home.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-primary" href="/shop" data-testid="index-btn-browseMenu">Browse Menu</a>
+    <a class="btn-secondary" href="/admin" data-testid="index-btn-viewOrders">View Orders</a>
+  </div>
+</div>
+
+<div class="features" data-testid="index-section-features">
+  <div class="feature-card" data-testid="index-card-feature-menu">
+    <div class="feature-title">Curated Menu</div>
+    <div class="feature-desc">Hand-picked coffees, aromatic teas, fresh-baked pastries, and cold-pressed juices.</div>
+  </div>
+  <div class="feature-card" data-testid="index-card-feature-delivery">
+    <div class="feature-title">Fast Delivery</div>
+    <div class="feature-desc">Place your order and track it from preparation to your doorstep in real time.</div>
+  </div>
+  <div class="feature-card" data-testid="index-card-feature-admin">
+    <div class="feature-title">Order Management</div>
+    <div class="feature-desc">Full admin dashboard to view, filter, and update order statuses as they progress.</div>
+  </div>
+</div>
+
+<div class="footer" data-testid="index-container-footer">
+  Coffee Home Delivery
+</div>
+
+</body>
+</html>

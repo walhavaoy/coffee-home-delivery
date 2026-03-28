@@ -119,8 +119,13 @@ export function createApp(): express.Application {
     res.json({ order: updated });
   });
 
-  // GET / — serve customer shop page
+  // GET / — serve landing page
   app.get('/', (_req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  });
+
+  // GET /shop — serve customer shop page
+  app.get('/shop', (_req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'shop.html'));
   });
 
