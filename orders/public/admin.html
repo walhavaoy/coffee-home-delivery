@@ -457,7 +457,7 @@ tr:hover td { background: var(--bg-hover); }
 <div class="main">
   <div class="error-banner" id="error-banner" role="alert" data-testid="admin-alert-error">
     <span id="error-message" data-testid="admin-text-errorMessage"></span>
-    <button class="error-dismiss" data-action="dismiss-error" aria-label="Dismiss error" tabindex="0">&times;</button>
+    <button class="error-dismiss" data-action="dismiss-error" data-testid="admin-btn-dismissError" aria-label="Dismiss error" tabindex="0">&times;</button>
   </div>
 
   <div class="summary-cards" data-testid="admin-container-summary">
@@ -528,7 +528,7 @@ tr:hover td { background: var(--bg-hover); }
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" data-testid="admin-heading-modalTitle">Order Details</span>
-      <button class="modal-close" data-action="close-modal" aria-label="Close" tabindex="0">&times;</button>
+      <button class="modal-close" data-action="close-modal" data-testid="admin-btn-closeModal" aria-label="Close" tabindex="0">&times;</button>
     </div>
     <div id="detail-body" data-testid="admin-container-modalBody"></div>
   </div>
