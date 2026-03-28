@@ -179,4 +179,75 @@ describe('Orders API', () => {
       expect(res.headers['content-type']).toMatch(/html/);
     });
   });
+
+  describe('Shop HTML data-testid selectors', () => {
+    let html: string;
+
+    beforeAll(async () => {
+      const res = await request(app).get('/');
+      html = res.text;
+    });
+
+    const shopTestIds = [
+      'shop-tab-catalogue',
+      'shop-tab-cart',
+      'shop-btn-viewCart',
+      'shop-badge-cartCount',
+      'shop-alert-error',
+      'shop-view-catalogue',
+      'shop-filter-category',
+      'shop-grid-products',
+      'shop-view-cart',
+      'shop-view-checkout',
+      'shop-input-customerName',
+      'shop-summary-checkoutItems',
+      'shop-text-checkoutTotal',
+      'shop-btn-placeOrder',
+      'shop-view-confirmation',
+    ];
+
+    it.each(shopTestIds)('contains data-testid="%s"', (testId) => {
+      expect(html).toContain(`data-testid="${testId}"`);
+    });
+  });
+
+  describe('Admin HTML data-testid selectors', () => {
+    let html: string;
+
+    beforeAll(async () => {
+      const res = await request(app).get('/admin');
+      html = res.text;
+    });
+
+    const adminTestIds = [
+      'admin-container-header',
+      'admin-heading-title',
+      'admin-badge-live',
+      'admin-text-lastUpdated',
+      'admin-button-refresh',
+      'admin-alert-error',
+      'admin-text-errorMessage',
+      'admin-container-summary',
+      'admin-value-total',
+      'admin-value-pending',
+      'admin-value-preparing',
+      'admin-value-delivering',
+      'admin-value-delivered',
+      'admin-value-cancelled',
+      'admin-container-toolbar',
+      'admin-select-statusFilter',
+      'admin-input-search',
+      'admin-text-orderCount',
+      'admin-container-table',
+      'admin-table-orders',
+      'admin-container-ordersBody',
+      'admin-modal-detail',
+      'admin-heading-modalTitle',
+      'admin-container-modalBody',
+    ];
+
+    it.each(adminTestIds)('contains data-testid="%s"', (testId) => {
+      expect(html).toContain(`data-testid="${testId}"`);
+    });
+  });
 });
