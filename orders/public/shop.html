@@ -373,7 +373,8 @@ body {
   margin-bottom: 0.375rem;
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea {
   width: 100%;
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -381,15 +382,20 @@ body {
   padding: 0.625rem 0.75rem;
   border-radius: 0.375rem;
   font-size: 0.875rem;
+  font-family: inherit;
   transition: border-color 0.15s;
 }
 
-.form-group input:focus {
+.form-group textarea { resize: vertical; }
+
+.form-group input:focus,
+.form-group textarea:focus {
   outline: none;
   border-color: var(--accent);
 }
 
-.form-group input::placeholder { color: var(--text-muted); }
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: var(--text-muted); }
 
 .form-error {
   color: var(--danger);
@@ -399,7 +405,8 @@ body {
 }
 
 .form-group.invalid .form-error { display: block; }
-.form-group.invalid input { border-color: var(--danger); }
+.form-group.invalid input,
+.form-group.invalid textarea { border-color: var(--danger); }
 
 .order-items-summary {
   margin-bottom: 0.75rem;
@@ -573,7 +580,7 @@ body {
 </div>
 
 <div class="container">
-  <div class="error-banner" id="errorBanner" role="alert" data-testid="shop-alert-error"></div>
+  <div class="error-banner" id="errorBanner" role="alert" data-testid="shop-alert-error" data-tid="checkout-error"></div>
 
   <!-- CATALOGUE VIEW -->
   <div id="catalogueView" class="view active" data-testid="shop-view-catalogue">
@@ -599,8 +606,16 @@ body {
         <h2>Your Details</h2>
         <div class="form-group" id="nameGroup">
           <label for="customerName">Name</label>
-          <input type="text" id="customerName" data-testid="shop-input-customerName" placeholder="Your full name" autocomplete="name">
+          <input type="text" id="customerName" data-testid="shop-input-customerName" data-tid="input-name" placeholder="Your full name" autocomplete="name">
           <div class="form-error">Please enter your name</div>
+        </div>
+      </div>
+      <div class="checkout-section">
+        <h2>Delivery Address</h2>
+        <div class="form-group" id="addressGroup">
+          <label for="customerAddress">Address</label>
+          <textarea id="customerAddress" data-testid="shop-input-customerAddress" data-tid="input-address" placeholder="Your delivery address" rows="2" autocomplete="street-address"></textarea>
+          <div class="form-error">Please enter your address</div>
         </div>
       </div>
       <div class="checkout-section">
@@ -611,7 +626,8 @@ body {
           <span id="checkoutTotal" data-testid="shop-text-checkoutTotal"></span>
         </div>
       </div>
-      <button class="place-order-btn" id="placeOrderBtn" data-testid="shop-btn-placeOrder" data-action="placeOrder">Place Order</button>
+      <button class="place-order-btn" id="placeOrderBtn" data-testid="shop-btn-placeOrder" data-tid="checkout-btn-submit" data-action="placeOrder">Place Order</button>
+      <div data-testid="shop-spinner-checkout" data-tid="checkout-loading" style="display:none;text-align:center;padding:0.75rem;color:var(--text-dim);font-size:0.875rem;">Placing order...</div>
     </div>
   </div>
 
@@ -747,14 +763,14 @@ body {
     var html = '';
     for (var i = 0; i < filtered.length; i++) {
       var p = filtered[i];
-      html += '<div class="product-card" data-testid="shop-card-product-' + escapeHtml(p.id) + '">'
-        + '<div class="product-category">' + escapeHtml(p.category) + '</div>'
-        + '<div class="product-name">' + escapeHtml(p.name) + '</div>'
-        + '<div class="product-desc">' + escapeHtml(p.description) + '</div>'
+      html += '<div class="product-card" data-testid="shop-card-product-' + escapeHtml(p.id) + '" data-tid="product-card">'
+        + '<div class="product-category" data-tid="product-image">' + escapeHtml(p.category) + '</div>'
+        + '<div class="product-name" data-tid="product-name">' + escapeHtml(p.name) + '</div>'
+        + '<div class="product-desc" data-tid="product-description">' + escapeHtml(p.description) + '</div>'
         + '<div class="product-footer">'
-        + '<span class="product-price">' + escapeHtml(formatPrice(p.price)) + '</span>'
+        + '<span class="product-price" data-tid="product-price">' + escapeHtml(formatPrice(p.price)) + '</span>'
         + '<button class="add-btn" data-action="addToCart" data-product-id="' + escapeHtml(p.id) + '" '
-        + 'data-testid="shop-btn-add-' + escapeHtml(p.id) + '" aria-label="Add ' + escapeHtml(p.name) + ' to cart">Add</button>'
+        + 'data-testid="shop-btn-add-' + escapeHtml(p.id) + '" data-tid="product-btn-add-to-cart" aria-label="Add ' + escapeHtml(p.name) + ' to cart">Add</button>'
         + '</div></div>';
     }
     grid.innerHTML = html;
@@ -765,7 +781,7 @@ body {
     var container = document.getElementById('cartContent');
 
     if (cart.length === 0) {
-      container.innerHTML = '<div class="cart-empty" data-testid="shop-text-cartEmpty">'
+      container.innerHTML = '<div class="cart-empty" data-testid="shop-text-cartEmpty" data-tid="cart-empty-message">'
         + '<p>Your cart is empty</p>'
         + '<button class="add-btn" data-action="navigate" data-view="catalogue" data-testid="shop-btn-browseCatalogue">Browse Menu</button>'
         + '</div>';
@@ -777,27 +793,27 @@ body {
 
     for (var i = 0; i < cart.length; i++) {
       var item = cart[i];
-      html += '<tr data-testid="shop-row-cart-' + escapeHtml(item.productId) + '">'
+      html += '<tr data-testid="shop-row-cart-' + escapeHtml(item.productId) + '" data-tid="cart-item">'
         + '<td class="item-name">' + escapeHtml(item.name) + '</td>'
         + '<td class="item-price">' + escapeHtml(formatPrice(item.price)) + '</td>'
         + '<td><div class="qty-control">'
         + '<button class="qty-btn" data-action="updateQty" data-product-id="' + escapeHtml(item.productId) + '" data-delta="-1" '
-        + 'data-testid="shop-btn-decrement-' + escapeHtml(item.productId) + '" aria-label="Decrease quantity">-</button>'
-        + '<span class="qty-value">' + item.quantity + '</span>'
+        + 'data-testid="shop-btn-decrement-' + escapeHtml(item.productId) + '" data-tid="cart-btn-decrement" aria-label="Decrease quantity">-</button>'
+        + '<span class="qty-value" data-tid="cart-item-quantity">' + item.quantity + '</span>'
         + '<button class="qty-btn" data-action="updateQty" data-product-id="' + escapeHtml(item.productId) + '" data-delta="1" '
-        + 'data-testid="shop-btn-increment-' + escapeHtml(item.productId) + '" aria-label="Increase quantity">+</button>'
+        + 'data-testid="shop-btn-increment-' + escapeHtml(item.productId) + '" data-tid="cart-btn-increment" aria-label="Increase quantity">+</button>'
         + '</div></td>'
         + '<td class="item-total">' + escapeHtml(formatPrice(item.price * item.quantity)) + '</td>'
         + '<td><button class="remove-btn" data-action="removeFromCart" data-product-id="' + escapeHtml(item.productId) + '" '
-        + 'data-testid="shop-btn-remove-' + escapeHtml(item.productId) + '" aria-label="Remove ' + escapeHtml(item.name) + '">Remove</button></td>'
+        + 'data-testid="shop-btn-remove-' + escapeHtml(item.productId) + '" data-tid="cart-btn-remove" aria-label="Remove ' + escapeHtml(item.name) + '">Remove</button></td>'
         + '</tr>';
     }
 
     html += '</tbody></table>';
     html += '<div class="cart-summary" data-testid="shop-summary-cart">'
       + '<div class="cart-summary-row"><span>Items</span><span>' + getCartCount() + '</span></div>'
-      + '<div class="cart-summary-row total"><span>Total</span><span>' + escapeHtml(formatPrice(getCartTotal())) + '</span></div>'
-      + '<button class="checkout-btn" data-action="navigate" data-view="checkout" data-testid="shop-btn-checkout">Proceed to Checkout</button>'
+      + '<div class="cart-summary-row total"><span>Total</span><span data-tid="cart-total">' + escapeHtml(formatPrice(getCartTotal())) + '</span></div>'
+      + '<button class="checkout-btn" data-action="navigate" data-view="checkout" data-testid="shop-btn-checkout" data-tid="cart-btn-checkout">Proceed to Checkout</button>'
       + '</div>';
 
     container.innerHTML = html;
@@ -821,6 +837,7 @@ body {
 
     // Reset form validation
     document.getElementById('nameGroup').classList.remove('invalid');
+    document.getElementById('addressGroup').classList.remove('invalid');
   }
 
   // --- Render: Confirmation ---
@@ -846,27 +863,43 @@ body {
       + '<h2 data-testid="shop-text-confirmationTitle">Order Confirmed</h2>'
       + '<p class="subtitle">Thank you, ' + escapeHtml(order.customerName) + '! Your order is on its way.</p>'
       + '<div class="confirmation-details" data-testid="shop-details-confirmation">'
-      + '<div class="detail-row"><span class="label">Order ID</span><span class="value" data-testid="shop-text-confirmationOrderId">' + escapeHtml(order.id) + '</span></div>'
+      + '<div class="detail-row"><span class="label">Order ID</span><span class="value" data-testid="shop-text-confirmationOrderId" data-tid="confirmation-order-id">' + escapeHtml(order.id) + '</span></div>'
       + '<div class="detail-row"><span class="label">Status</span><span class="value">' + escapeHtml(order.status) + '</span></div>'
       + '<div class="detail-row"><span class="label">Placed</span><span class="value">' + escapeHtml(new Date(order.createdAt).toLocaleString()) + '</span></div>'
-      + '<div class="detail-row total"><span class="label">Total</span><span class="value">' + escapeHtml(formatPrice(order.total)) + '</span></div>'
-      + '<div class="confirmation-items"><h3>Items</h3>' + itemsHtml + '</div>'
+      + '<div class="detail-row"><span class="label">Estimated Delivery</span><span class="value" data-testid="shop-text-confirmationDelivery" data-tid="confirmation-delivery-estimate">30\u201345 minutes</span></div>'
+      + '<div class="detail-row total"><span class="label">Total</span><span class="value" data-tid="confirmation-total">' + escapeHtml(formatPrice(order.total)) + '</span></div>'
+      + '<div class="confirmation-items" data-tid="confirmation-items"><h3>Items</h3>' + itemsHtml + '</div>'
       + '</div>'
-      + '<button class="continue-btn" data-action="continueShopping" data-testid="shop-btn-continueShopping">Continue Shopping</button>';
+      + '<button class="continue-btn" data-action="continueShopping" data-testid="shop-btn-continueShopping" data-tid="confirmation-link-back">Continue Shopping</button>';
   }
 
   // --- Place Order ---
   function placeOrder() {
     var nameInput = document.getElementById('customerName');
     var nameGroup = document.getElementById('nameGroup');
+    var addressInput = document.getElementById('customerAddress');
+    var addressGroup = document.getElementById('addressGroup');
     var name = nameInput.value.trim();
+    var address = addressInput.value.trim();
+    var valid = true;
 
     if (!name) {
       nameGroup.classList.add('invalid');
       nameInput.focus();
-      return;
+      valid = false;
+    } else {
+      nameGroup.classList.remove('invalid');
     }
-    nameGroup.classList.remove('invalid');
+
+    if (!address) {
+      addressGroup.classList.add('invalid');
+      if (valid) addressInput.focus();
+      valid = false;
+    } else {
+      addressGroup.classList.remove('invalid');
+    }
+
+    if (!valid) return;
 
     if (cart.length === 0) {
       showError('Your cart is empty');
@@ -874,8 +907,10 @@ body {
     }
 
     var btn = document.getElementById('placeOrderBtn');
+    var loadingEl = document.querySelector('[data-tid="checkout-loading"]');
     btn.disabled = true;
     btn.textContent = 'Placing order...';
+    if (loadingEl) loadingEl.style.display = 'block';
 
     var payload = {
       customerName: name,
@@ -902,6 +937,7 @@ body {
       cart = [];
       updateCartBadge();
       nameInput.value = '';
+      addressInput.value = '';
       renderConfirmation(confirmedOrder);
       navigate('confirmation');
     })
@@ -911,6 +947,7 @@ body {
     .finally(function () {
       btn.disabled = false;
       btn.textContent = 'Place Order';
+      if (loadingEl) loadingEl.style.display = 'none';
     });
   }
 
