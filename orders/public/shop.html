@@ -532,6 +532,82 @@ body {
 
 .continue-btn:hover { background: var(--accent-hover); }
 
+/* Orders */
+.orders-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-dim);
+}
+
+.orders-empty p { margin-bottom: 1rem; font-size: 1rem; }
+
+.order-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.order-card-id {
+  font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.8125rem;
+  color: var(--accent);
+}
+
+.order-card-status {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.order-card-status.status-pending { background: var(--warning-bg); color: var(--warning); }
+.order-card-status.status-confirmed { background: var(--info-bg); color: var(--info); }
+.order-card-status.status-preparing { background: var(--info-bg); color: var(--info); }
+.order-card-status.status-delivering { background: var(--success-bg); color: var(--success); }
+.order-card-status.status-delivered { background: var(--success-bg); color: var(--success); }
+.order-card-status.status-cancelled { background: var(--danger-bg); color: var(--danger); }
+
+.order-card-customer {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.order-card-items {
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.order-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8125rem;
+}
+
+.order-card-total {
+  font-weight: 700;
+  color: var(--success);
+}
+
+.order-card-date {
+  color: var(--text-muted);
+}
+
 /* Error banner */
 .error-banner {
   background: var(--danger-bg);
@@ -563,6 +639,7 @@ body {
     <div class="nav-tabs">
       <button class="nav-tab active" data-testid="shop-tab-catalogue" data-action="navigate" data-view="catalogue" aria-label="Browse catalogue">Menu</button>
       <button class="nav-tab" data-testid="shop-tab-cart" data-action="navigate" data-view="cart" aria-label="View cart">Cart</button>
+      <button class="nav-tab" data-testid="shop-tab-orders" data-action="navigate" data-view="orders" aria-label="View orders">Orders</button>
     </div>
   </div>
   <div class="header-right">
@@ -615,6 +692,11 @@ body {
     </div>
   </div>
 
+  <!-- ORDERS VIEW -->
+  <div id="ordersView" class="view" data-testid="shop-view-orders">
+    <div id="ordersContent" data-testid="shop-container-orders"></div>
+  </div>
+
   <!-- CONFIRMATION VIEW -->
   <div id="confirmationView" class="view" data-testid="shop-view-confirmation">
     <div class="confirmation" id="confirmationContent"></div>
@@ -627,6 +709,7 @@ body {
 
   var products = [];
   var cart = [];
+  var orders = [];
   var currentFilter = 'all';
   var confirmedOrder = null;
 
@@ -654,7 +737,7 @@ body {
 
   // --- Navigation ---
   function navigate(view) {
-    var views = ['catalogue', 'cart', 'checkout', 'confirmation'];
+    var views = ['catalogue', 'cart', 'checkout', 'confirmation', 'orders'];
     for (var i = 0; i < views.length; i++) {
       var el = document.getElementById(views[i] + 'View');
       el.classList.toggle('active', views[i] === view);
@@ -665,6 +748,7 @@ body {
     }
     if (view === 'cart') renderCart();
     if (view === 'checkout') renderCheckout();
+    if (view === 'orders') renderOrders();
   }
 
   // --- Cart helpers ---
@@ -914,6 +998,58 @@ body {
     });
   }
 
+  // --- Render: Orders ---
+  function renderOrders() {
+    var container = document.getElementById('ordersContent');
+
+    if (orders.length === 0) {
+      container.innerHTML = '<div class="orders-empty" data-testid="shop-text-ordersEmpty">'
+        + '<p>No orders yet</p>'
+        + '<button class="add-btn" data-action="navigate" data-view="catalogue" data-testid="shop-btn-browseFromOrders">Browse Menu</button>'
+        + '</div>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < orders.length; i++) {
+      var o = orders[i];
+      var itemsText = '';
+      if (o.items && o.items.length > 0) {
+        itemsText = o.items.map(function (item) { return escapeHtml(item); }).join(', ');
+      }
+
+      html += '<div class="order-card" data-testid="shop-card-order-' + escapeHtml(o.id.slice(0, 8)) + '">'
+        + '<div class="order-card-header">'
+        + '<span class="order-card-id" data-testid="shop-text-orderId-' + escapeHtml(o.id.slice(0, 8)) + '">' + escapeHtml(o.id.slice(0, 8)) + '</span>'
+        + '<span class="order-card-status status-' + escapeHtml(o.status) + '">' + escapeHtml(o.status) + '</span>'
+        + '</div>'
+        + '<div class="order-card-customer">' + escapeHtml(o.customerName) + '</div>'
+        + '<div class="order-card-items">' + (itemsText || 'No items') + '</div>'
+        + '<div class="order-card-footer">'
+        + '<span class="order-card-total">' + escapeHtml(formatPrice(o.total)) + '</span>'
+        + '<span class="order-card-date">' + escapeHtml(new Date(o.createdAt).toLocaleString()) + '</span>'
+        + '</div>'
+        + '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  // --- Load Orders ---
+  function loadOrders() {
+    fetch('/api/orders')
+      .then(function (res) {
+        if (!res.ok) throw new Error('Failed to load orders');
+        return res.json();
+      })
+      .then(function (data) {
+        orders = data.orders || [];
+      })
+      .catch(function (err) {
+        showError(err.message);
+      });
+  }
+
   // --- Load Products ---
   function loadProducts() {
     fetch('/api/products')
@@ -995,6 +1131,7 @@ body {
 
   // --- Init ---
   loadProducts();
+  loadOrders();
 })();
 </script>
 </body>
