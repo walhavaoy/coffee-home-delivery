@@ -1,0 +1,99 @@
+name: Deploy changed components
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  detect-changes:
+    name: Detect changed components
+    runs-on: ubuntu-latest
+    outputs:
+      components: ${{ steps.changes.outputs.components }}
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed components
+        id: changes
+        run: |
+          BASE_SHA="${{ github.event.before }}"
+          # On first push or force-push, compare against parent
+          if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            BASE_SHA="HEAD~1"
+          fi
+
+          # Find component directories (contain package.json)
+          COMPONENTS=()
+          for pkg in $(find . -maxdepth 2 -name 'package.json' \
+                        -not -path './node_modules/*' \
+                        -not -path './package.json' \
+                        | sed 's|^\./||;s|/package.json$||' | sort); do
+            if ! git diff --quiet "$BASE_SHA" HEAD -- "$pkg/"; then
+              COMPONENTS+=("\"$pkg\"")
+            fi
+          done
+
+          if [ ${#COMPONENTS[@]} -eq 0 ]; then
+            echo "components=[]" >> "$GITHUB_OUTPUT"
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No component changes detected — skipping deploy."
+          else
+            JSON=$(printf '[%s]' "$(IFS=,; echo "${COMPONENTS[*]}")")
+            echo "components=$JSON" >> "$GITHUB_OUTPUT"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Changed components: $JSON"
+          fi
+
+  build-and-deploy:
+    name: Build & deploy ${{ matrix.component }}
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJson(needs.detect-changes.outputs.components) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '${{ matrix.component }}/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.component }}
+        run: npm ci
+
+      - name: Build
+        working-directory: ${{ matrix.component }}
+        run: npm run build
+
+      - name: Run tests
+        working-directory: ${{ matrix.component }}
+        run: |
+          if npm run --silent test -- --help >/dev/null 2>&1; then
+            npm test
+          else
+            echo "No test script — skipping."
+          fi
+
+      - name: Build Docker image
+        working-directory: ${{ matrix.component }}
+        run: |
+          if [ -f Dockerfile ]; then
+            IMAGE_TAG="${{ github.sha }}"
+            IMAGE_NAME="ghcr.io/${{ github.repository }}/${{ matrix.component }}"
+            docker build -t "${IMAGE_NAME}:${IMAGE_TAG}" -t "${IMAGE_NAME}:latest" .
+            echo "Built image: ${IMAGE_NAME}:${IMAGE_TAG}"
+          else
+            echo "No Dockerfile — skipping image build."
+          fi
