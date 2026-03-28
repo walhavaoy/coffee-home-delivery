@@ -5,7 +5,7 @@ import {
   getAllOrders, getOrderById, updateOrderStatus, isValidStatus, seedOrders,
   getAllProducts, getProductById, createOrder,
 } from './store';
-import type { CreateOrderInput, OrderItem } from './store';
+import type { CreateOrderInput, OrderItem } from './types';
 
 const logger = pino({ name: 'orders' });
 

@@ -1,37 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'delivered' | 'cancelled';
-
-export interface Product {
-  id: string;
-  name: string;
-  category: 'coffee' | 'tea' | 'bakery' | 'juice';
-  description: string;
-  price: number;
-}
-
-export interface OrderItem {
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
-export interface Order {
-  id: string;
-  customerName: string;
-  items: string[];
-  orderItems: OrderItem[];
-  total: number;
-  status: OrderStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreateOrderInput {
-  customerName: string;
-  items: OrderItem[];
-}
+export type { Product, ProductCategory, OrderStatus, OrderItem, Order, CartItem, CreateOrderInput } from './types';
+import type { Product, OrderStatus, OrderItem, Order, CreateOrderInput } from './types';
 
 const products: Product[] = [
   { id: 'latte', name: 'Latte', category: 'coffee', description: 'Smooth espresso with steamed milk', price: 4.50 },
