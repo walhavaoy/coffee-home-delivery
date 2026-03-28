@@ -737,9 +737,13 @@ tr:hover td { background: var(--bg-hover); }
 
     var items = (order.items || []).map(function (item) { return escapeHtml(item); }).join(', ');
 
+    var totalFormatted = typeof order.total === 'number' ? '$' + order.total.toFixed(2) : 'N/A';
+
     var html = '<div class="detail-row"><span class="detail-label">Order ID</span><span class="detail-value" data-testid="admin-text-detailId">' + escapeHtml(order.id) + '</span></div>'
       + '<div class="detail-row"><span class="detail-label">Customer</span><span class="detail-value" data-testid="admin-text-detailCustomer">' + escapeHtml(order.customerName) + '</span></div>'
+      + '<div class="detail-row"><span class="detail-label">Address</span><span class="detail-value" data-testid="admin-text-detailAddress">' + escapeHtml(order.address || 'N/A') + '</span></div>'
       + '<div class="detail-row"><span class="detail-label">Items</span><span class="detail-value" data-testid="admin-text-detailItems">' + (items || 'None') + '</span></div>'
+      + '<div class="detail-row"><span class="detail-label">Total</span><span class="detail-value" data-testid="admin-text-detailTotal">' + escapeHtml(totalFormatted) + '</span></div>'
       + '<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="' + statusClass(order.status) + '">' + escapeHtml(order.status) + '</span></span></div>'
       + '<div class="detail-row"><span class="detail-label">Created</span><span class="detail-value" data-testid="admin-text-detailCreated">' + formatTime(order.createdAt) + '</span></div>'
       + '<div class="detail-row"><span class="detail-label">Updated</span><span class="detail-value" data-testid="admin-text-detailUpdated">' + formatTime(order.updatedAt) + '</span></div>';

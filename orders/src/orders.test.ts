@@ -23,6 +23,7 @@ describe('Orders API', () => {
       for (const order of res.body.orders) {
         expect(order).toHaveProperty('id');
         expect(order).toHaveProperty('customerName');
+        expect(order).toHaveProperty('address');
         expect(order).toHaveProperty('items');
         expect(order).toHaveProperty('status');
         expect(order).toHaveProperty('createdAt');
@@ -124,6 +125,7 @@ describe('Orders API', () => {
         .post('/api/orders')
         .send({
           customerName: 'Test User',
+          address: '10 Downing St, London',
           items: [
             { productId: products[0].id, name: products[0].name, price: products[0].price, quantity: 2 },
           ],
@@ -131,6 +133,7 @@ describe('Orders API', () => {
       expect(res.status).toBe(201);
       expect(res.body.order).toHaveProperty('id');
       expect(res.body.order.customerName).toBe('Test User');
+      expect(res.body.order.address).toBe('10 Downing St, London');
       expect(res.body.order.status).toBe('pending');
       expect(res.body.order.total).toBe(products[0].price * 2);
     });
@@ -138,28 +141,36 @@ describe('Orders API', () => {
     it('returns 400 for missing customerName', async () => {
       const res = await request(app)
         .post('/api/orders')
-        .send({ items: [{ productId: 'latte', name: 'Latte', price: 4.5, quantity: 1 }] });
+        .send({ address: '1 Main St', items: [{ productId: 'latte', name: 'Latte', price: 4.5, quantity: 1 }] });
       expect(res.status).toBe(400);
+    });
+
+    it('returns 400 for missing address', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 'Test', items: [{ productId: 'latte', name: 'Latte', price: 4.5, quantity: 1 }] });
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(/address/i);
     });
 
     it('returns 400 for empty items', async () => {
       const res = await request(app)
         .post('/api/orders')
-        .send({ customerName: 'Test', items: [] });
+        .send({ customerName: 'Test', address: '1 Main St', items: [] });
       expect(res.status).toBe(400);
     });
 
     it('returns 400 for invalid item', async () => {
       const res = await request(app)
         .post('/api/orders')
-        .send({ customerName: 'Test', items: [{ productId: 'latte' }] });
+        .send({ customerName: 'Test', address: '1 Main St', items: [{ productId: 'latte' }] });
       expect(res.status).toBe(400);
     });
 
     it('returns 400 for unknown product', async () => {
       const res = await request(app)
         .post('/api/orders')
-        .send({ customerName: 'Test', items: [{ productId: 'nonexistent', name: 'X', price: 1, quantity: 1 }] });
+        .send({ customerName: 'Test', address: '1 Main St', items: [{ productId: 'nonexistent', name: 'X', price: 1, quantity: 1 }] });
       expect(res.status).toBe(400);
     });
   });

@@ -602,6 +602,11 @@ body {
           <input type="text" id="customerName" data-testid="shop-input-customerName" placeholder="Your full name" autocomplete="name">
           <div class="form-error">Please enter your name</div>
         </div>
+        <div class="form-group" id="addressGroup">
+          <label for="customerAddress">Delivery Address</label>
+          <input type="text" id="customerAddress" data-testid="shop-input-customerAddress" placeholder="Your delivery address" autocomplete="street-address">
+          <div class="form-error">Please enter your address</div>
+        </div>
       </div>
       <div class="checkout-section">
         <h2>Order Summary</h2>
@@ -821,6 +826,7 @@ body {
 
     // Reset form validation
     document.getElementById('nameGroup').classList.remove('invalid');
+    document.getElementById('addressGroup').classList.remove('invalid');
   }
 
   // --- Render: Confirmation ---
@@ -847,6 +853,7 @@ body {
       + '<p class="subtitle">Thank you, ' + escapeHtml(order.customerName) + '! Your order is on its way.</p>'
       + '<div class="confirmation-details" data-testid="shop-details-confirmation">'
       + '<div class="detail-row"><span class="label">Order ID</span><span class="value" data-testid="shop-text-confirmationOrderId">' + escapeHtml(order.id) + '</span></div>'
+      + '<div class="detail-row"><span class="label">Delivery Address</span><span class="value" data-testid="shop-text-confirmationAddress">' + escapeHtml(order.address) + '</span></div>'
       + '<div class="detail-row"><span class="label">Status</span><span class="value">' + escapeHtml(order.status) + '</span></div>'
       + '<div class="detail-row"><span class="label">Placed</span><span class="value">' + escapeHtml(new Date(order.createdAt).toLocaleString()) + '</span></div>'
       + '<div class="detail-row total"><span class="label">Total</span><span class="value">' + escapeHtml(formatPrice(order.total)) + '</span></div>'
@@ -859,14 +866,29 @@ body {
   function placeOrder() {
     var nameInput = document.getElementById('customerName');
     var nameGroup = document.getElementById('nameGroup');
+    var addressInput = document.getElementById('customerAddress');
+    var addressGroup = document.getElementById('addressGroup');
     var name = nameInput.value.trim();
+    var address = addressInput.value.trim();
+    var valid = true;
 
     if (!name) {
       nameGroup.classList.add('invalid');
-      nameInput.focus();
-      return;
+      if (valid) nameInput.focus();
+      valid = false;
+    } else {
+      nameGroup.classList.remove('invalid');
     }
-    nameGroup.classList.remove('invalid');
+
+    if (!address) {
+      addressGroup.classList.add('invalid');
+      if (valid) addressInput.focus();
+      valid = false;
+    } else {
+      addressGroup.classList.remove('invalid');
+    }
+
+    if (!valid) return;
 
     if (cart.length === 0) {
       showError('Your cart is empty');
@@ -879,6 +901,7 @@ body {
 
     var payload = {
       customerName: name,
+      address: address,
       items: cart.map(function (c) {
         return { productId: c.productId, name: c.name, price: c.price, quantity: c.quantity };
       })
@@ -902,6 +925,7 @@ body {
       cart = [];
       updateCartBadge();
       nameInput.value = '';
+      addressInput.value = '';
       renderConfirmation(confirmedOrder);
       navigate('confirmation');
     })

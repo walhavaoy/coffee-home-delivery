@@ -60,10 +60,16 @@ export function createApp(): express.Application {
   app.post('/api/orders', (req, res) => {
     const body = req.body as Record<string, unknown>;
     const customerName = body['customerName'];
+    const address = body['address'];
     const items = body['items'];
 
     if (typeof customerName !== 'string' || customerName.trim().length === 0) {
       res.status(400).json({ error: 'Missing or empty "customerName"' });
+      return;
+    }
+
+    if (typeof address !== 'string' || address.trim().length === 0) {
+      res.status(400).json({ error: 'Missing or empty "address"' });
       return;
     }
 
@@ -86,6 +92,7 @@ export function createApp(): express.Application {
 
     const input: CreateOrderInput = {
       customerName: customerName.trim(),
+      address: (address as string).trim(),
       items: items as OrderItem[],
     };
 
