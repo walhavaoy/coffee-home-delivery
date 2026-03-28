@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'delivered' | 'cancelled';
+export type OrderStatus = 'new' | 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'delivered' | 'cancelled';
 
 export interface Product {
   id: string;
@@ -69,7 +69,7 @@ export function createOrder(input: CreateOrderInput): Order {
     items: itemNames,
     orderItems: input.items,
     total,
-    status: 'pending',
+    status: 'new',
     createdAt: now,
     updatedAt: now,
   };
@@ -80,9 +80,9 @@ export function createOrder(input: CreateOrderInput): Order {
 export function seedOrders(): void {
   const now = new Date().toISOString();
   const samples: Array<{ customerName: string; items: string[]; orderItems: OrderItem[]; total: number; status: OrderStatus }> = [
-    { customerName: 'Alice', items: ['Latte x1', 'Croissant x1'], orderItems: [{ productId: 'latte', name: 'Latte', price: 4.50, quantity: 1 }, { productId: 'croissant', name: 'Croissant', price: 3.50, quantity: 1 }], total: 8.00, status: 'pending' },
-    { customerName: 'Bob', items: ['Espresso x1'], orderItems: [{ productId: 'espresso', name: 'Espresso', price: 3.00, quantity: 1 }], total: 3.00, status: 'confirmed' },
-    { customerName: 'Carol', items: ['Cappuccino x1', 'Muffin x1', 'Orange Juice x1'], orderItems: [{ productId: 'cappuccino', name: 'Cappuccino', price: 4.50, quantity: 1 }, { productId: 'muffin', name: 'Blueberry Muffin', price: 3.00, quantity: 1 }, { productId: 'orange-juice', name: 'Orange Juice', price: 4.00, quantity: 1 }], total: 11.50, status: 'delivering' },
+    { customerName: 'Alice', items: ['Latte x1', 'Croissant x1'], orderItems: [{ productId: 'latte', name: 'Latte', price: 4.50, quantity: 1 }, { productId: 'croissant', name: 'Croissant', price: 3.50, quantity: 1 }], total: 8.00, status: 'new' },
+    { customerName: 'Bob', items: ['Espresso x1'], orderItems: [{ productId: 'espresso', name: 'Espresso', price: 3.00, quantity: 1 }], total: 3.00, status: 'preparing' },
+    { customerName: 'Carol', items: ['Cappuccino x1', 'Muffin x1', 'Orange Juice x1'], orderItems: [{ productId: 'cappuccino', name: 'Cappuccino', price: 4.50, quantity: 1 }, { productId: 'muffin', name: 'Blueberry Muffin', price: 3.00, quantity: 1 }, { productId: 'orange-juice', name: 'Orange Juice', price: 4.00, quantity: 1 }], total: 11.50, status: 'delivered' },
   ];
   for (const s of samples) {
     const id = uuidv4();
@@ -107,7 +107,7 @@ export function updateOrderStatus(id: string, status: OrderStatus): Order | unde
 }
 
 const validStatuses: ReadonlySet<string> = new Set<OrderStatus>([
-  'pending', 'confirmed', 'preparing', 'delivering', 'delivered', 'cancelled',
+  'new', 'pending', 'confirmed', 'preparing', 'delivering', 'delivered', 'cancelled',
 ]);
 
 export function isValidStatus(value: unknown): value is OrderStatus {

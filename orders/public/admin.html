@@ -279,6 +279,7 @@ tr:hover td { background: var(--bg-hover); }
   text-transform: capitalize;
 }
 
+.status-new { background: var(--warning-bg); color: var(--warning); }
 .status-pending { background: var(--warning-bg); color: var(--warning); }
 .status-confirmed { background: var(--info-bg); color: var(--info); }
 .status-preparing { background: var(--info-bg); color: var(--info); }
@@ -466,24 +467,16 @@ tr:hover td { background: var(--bg-hover); }
       <div class="summary-value" data-testid="admin-value-total">0</div>
     </div>
     <div class="summary-card">
-      <div class="summary-label">Pending</div>
-      <div class="summary-value" data-testid="admin-value-pending">0</div>
+      <div class="summary-label">New</div>
+      <div class="summary-value" data-testid="admin-value-new">0</div>
     </div>
     <div class="summary-card">
       <div class="summary-label">Preparing</div>
       <div class="summary-value" data-testid="admin-value-preparing">0</div>
     </div>
     <div class="summary-card">
-      <div class="summary-label">Delivering</div>
-      <div class="summary-value" data-testid="admin-value-delivering">0</div>
-    </div>
-    <div class="summary-card">
       <div class="summary-label">Delivered</div>
       <div class="summary-value" data-testid="admin-value-delivered">0</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-label">Cancelled</div>
-      <div class="summary-value" data-testid="admin-value-cancelled">0</div>
     </div>
   </div>
 
@@ -492,12 +485,9 @@ tr:hover td { background: var(--bg-hover); }
       <label class="filter-label" for="status-filter">Status:</label>
       <select class="filter-select" id="status-filter" data-testid="admin-select-statusFilter">
         <option value="">All</option>
-        <option value="pending">Pending</option>
-        <option value="confirmed">Confirmed</option>
+        <option value="new">New</option>
         <option value="preparing">Preparing</option>
-        <option value="delivering">Delivering</option>
         <option value="delivered">Delivered</option>
-        <option value="cancelled">Cancelled</option>
       </select>
     </div>
     <input type="text" class="search-input" id="search-input" placeholder="Search by customer or order ID..." data-testid="admin-input-search" aria-label="Search orders">
@@ -538,7 +528,7 @@ tr:hover td { background: var(--bg-hover); }
 (function () {
   'use strict';
 
-  var STATUSES = ['pending', 'confirmed', 'preparing', 'delivering', 'delivered', 'cancelled'];
+  var STATUSES = ['new', 'preparing', 'delivered'];
   var POLL_INTERVAL = 5000;
 
   var allOrders = [];
@@ -590,11 +580,9 @@ tr:hover td { background: var(--bg-hover); }
       }
     }
     document.querySelector('[data-testid="admin-value-total"]').textContent = String(allOrders.length);
-    document.querySelector('[data-testid="admin-value-pending"]').textContent = String(counts.pending || 0);
+    document.querySelector('[data-testid="admin-value-new"]').textContent = String(counts['new'] || 0);
     document.querySelector('[data-testid="admin-value-preparing"]').textContent = String(counts.preparing || 0);
-    document.querySelector('[data-testid="admin-value-delivering"]').textContent = String(counts.delivering || 0);
     document.querySelector('[data-testid="admin-value-delivered"]').textContent = String(counts.delivered || 0);
-    document.querySelector('[data-testid="admin-value-cancelled"]').textContent = String(counts.cancelled || 0);
   }
 
   function getFilteredOrders() {

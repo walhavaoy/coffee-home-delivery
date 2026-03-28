@@ -131,7 +131,7 @@ describe('Orders API', () => {
       expect(res.status).toBe(201);
       expect(res.body.order).toHaveProperty('id');
       expect(res.body.order.customerName).toBe('Test User');
-      expect(res.body.order.status).toBe('pending');
+      expect(res.body.order.status).toBe('new');
       expect(res.body.order.total).toBe(products[0].price * 2);
     });
 
