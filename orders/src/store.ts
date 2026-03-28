@@ -24,6 +24,9 @@ export interface Order {
   orderItems: OrderItem[];
   total: number;
   status: OrderStatus;
+  domain: string | null;
+  portalUrl: string | null;
+  shellUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,6 +34,7 @@ export interface Order {
 export interface CreateOrderInput {
   customerName: string;
   items: OrderItem[];
+  domain?: string;
 }
 
 const products: Product[] = [
@@ -58,11 +62,22 @@ export function getProductById(id: string): Product | undefined {
 
 const orders: Map<string, Order> = new Map();
 
+export function sshToHttpsUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const match = url.match(/^git@([^:]+):(.+?)(?:\.git)?$/);
+  if (match) {
+    return `https://${match[1]}/${match[2]}`;
+  }
+  return url;
+}
+
 export function createOrder(input: CreateOrderInput): Order {
   const id = uuidv4();
   const now = new Date().toISOString();
   const total = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemNames = input.items.map(i => `${i.name} x${i.quantity}`);
+  const domain = input.domain ?? null;
+  const portalUrl = domain ? `https://${domain}` : null;
   const order: Order = {
     id,
     customerName: input.customerName,
@@ -70,23 +85,28 @@ export function createOrder(input: CreateOrderInput): Order {
     orderItems: input.items,
     total,
     status: 'pending',
+    domain,
+    portalUrl,
+    shellUrl: null,
     createdAt: now,
     updatedAt: now,
   };
   orders.set(id, order);
+  order.shellUrl = `https://tmpclaw.io/#projects?project=${id}`;
   return order;
 }
 
 export function seedOrders(): void {
   const now = new Date().toISOString();
-  const samples: Array<{ customerName: string; items: string[]; orderItems: OrderItem[]; total: number; status: OrderStatus }> = [
-    { customerName: 'Alice', items: ['Latte x1', 'Croissant x1'], orderItems: [{ productId: 'latte', name: 'Latte', price: 4.50, quantity: 1 }, { productId: 'croissant', name: 'Croissant', price: 3.50, quantity: 1 }], total: 8.00, status: 'pending' },
-    { customerName: 'Bob', items: ['Espresso x1'], orderItems: [{ productId: 'espresso', name: 'Espresso', price: 3.00, quantity: 1 }], total: 3.00, status: 'confirmed' },
-    { customerName: 'Carol', items: ['Cappuccino x1', 'Muffin x1', 'Orange Juice x1'], orderItems: [{ productId: 'cappuccino', name: 'Cappuccino', price: 4.50, quantity: 1 }, { productId: 'muffin', name: 'Blueberry Muffin', price: 3.00, quantity: 1 }, { productId: 'orange-juice', name: 'Orange Juice', price: 4.00, quantity: 1 }], total: 11.50, status: 'delivering' },
+  const samples: Array<{ customerName: string; items: string[]; orderItems: OrderItem[]; total: number; status: OrderStatus; domain: string | null; portalUrl: string | null; shellUrl: string | null }> = [
+    { customerName: 'Alice', items: ['Latte x1', 'Croissant x1'], orderItems: [{ productId: 'latte', name: 'Latte', price: 4.50, quantity: 1 }, { productId: 'croissant', name: 'Croissant', price: 3.50, quantity: 1 }], total: 8.00, status: 'pending', domain: null, portalUrl: null, shellUrl: null },
+    { customerName: 'Bob', items: ['Espresso x1'], orderItems: [{ productId: 'espresso', name: 'Espresso', price: 3.00, quantity: 1 }], total: 3.00, status: 'confirmed', domain: null, portalUrl: null, shellUrl: null },
+    { customerName: 'Carol', items: ['Cappuccino x1', 'Muffin x1', 'Orange Juice x1'], orderItems: [{ productId: 'cappuccino', name: 'Cappuccino', price: 4.50, quantity: 1 }, { productId: 'muffin', name: 'Blueberry Muffin', price: 3.00, quantity: 1 }, { productId: 'orange-juice', name: 'Orange Juice', price: 4.00, quantity: 1 }], total: 11.50, status: 'delivering', domain: null, portalUrl: null, shellUrl: null },
   ];
   for (const s of samples) {
     const id = uuidv4();
-    orders.set(id, { id, ...s, createdAt: now, updatedAt: now });
+    const shellUrl = `https://tmpclaw.io/#projects?project=${id}`;
+    orders.set(id, { id, ...s, shellUrl, createdAt: now, updatedAt: now });
   }
 }
 
