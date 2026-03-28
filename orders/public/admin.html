@@ -628,7 +628,7 @@ tr:hover td { background: var(--bg-hover); }
     orderCountEl.textContent = 'Showing ' + filtered.length + ' of ' + allOrders.length;
 
     if (filtered.length === 0) {
-      tbody.innerHTML = '<tr class="empty-row" data-testid="admin-row-empty"><td colspan="7">No orders match the current filter.</td></tr>';
+      tbody.innerHTML = '<tr class="empty-row" data-testid="admin-row-empty"><td colspan="7" data-testid="empty-state">No orders match the current filter.</td></tr>';
       updateSortArrows();
       return;
     }
