@@ -77,9 +77,14 @@ export function createApp(): express.Application {
         res.status(400).json({ error: 'Each item must have productId, name, price (>0), and quantity (integer >0)' });
         return;
       }
-      const product = getProductById((item as OrderItem).productId);
+      const orderItem = item as OrderItem;
+      const product = getProductById(orderItem.productId);
       if (!product) {
-        res.status(400).json({ error: `Unknown product: ${String((item as OrderItem).productId)}` });
+        res.status(400).json({ error: `Unknown product: ${String(orderItem.productId)}` });
+        return;
+      }
+      if (orderItem.price !== product.price) {
+        res.status(400).json({ error: `Price mismatch for product "${product.name}": submitted ${orderItem.price}, expected ${product.price}` });
         return;
       }
     }

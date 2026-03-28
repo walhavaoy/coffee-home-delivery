@@ -115,6 +115,16 @@ describe('Orders API', () => {
       const res = await request(app).get('/api/orders/nonexistent');
       expect(res.status).toBe(404);
     });
+
+    it('returns 404 for empty string order ID', async () => {
+      const res = await request(app).get('/api/orders/%20');
+      expect(res.status).toBe(404);
+    });
+
+    it('returns 404 for special characters in order ID', async () => {
+      const res = await request(app).get('/api/orders/!@%23$%25');
+      expect(res.status).toBe(404);
+    });
   });
 
   describe('POST /api/orders', () => {
@@ -160,6 +170,87 @@ describe('Orders API', () => {
       const res = await request(app)
         .post('/api/orders')
         .send({ customerName: 'Test', items: [{ productId: 'nonexistent', name: 'X', price: 1, quantity: 1 }] });
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 for completely empty body', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({});
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(/customerName/i);
+    });
+
+    it('returns 400 for whitespace-only customerName', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: '   ', items: [{ productId: 'latte', name: 'Latte', price: 4.5, quantity: 1 }] });
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(/customerName/i);
+    });
+
+    it('returns 400 for non-string customerName', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 12345, items: [{ productId: 'latte', name: 'Latte', price: 4.5, quantity: 1 }] });
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 for null customerName', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: null, items: [{ productId: 'latte', name: 'Latte', price: 4.5, quantity: 1 }] });
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when items field is missing entirely', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 'Test' });
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(/items/i);
+    });
+
+    it('returns 400 when items is not an array', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 'Test', items: 'not-an-array' });
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 for item with zero quantity', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 'Test', items: [{ productId: 'latte', name: 'Latte', price: 4.5, quantity: 0 }] });
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 for item with negative price', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 'Test', items: [{ productId: 'latte', name: 'Latte', price: -1, quantity: 1 }] });
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 for item with fractional quantity', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 'Test', items: [{ productId: 'latte', name: 'Latte', price: 4.5, quantity: 1.5 }] });
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 for price mismatch with catalog', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 'Test', items: [{ productId: 'latte', name: 'Latte', price: 0.01, quantity: 1 }] });
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(/price mismatch/i);
+    });
+
+    it('returns 400 for item missing required fields', async () => {
+      const res = await request(app)
+        .post('/api/orders')
+        .send({ customerName: 'Test', items: [{}] });
       expect(res.status).toBe(400);
     });
   });
