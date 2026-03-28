@@ -1,5 +1,5 @@
 image:
-  repository: localhost:31500/tmpclaw/agent
+  repository: localhost:31500/tmpclaw/orders
   tag: latest
   pullPolicy: Always
 
