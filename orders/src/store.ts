@@ -17,9 +17,16 @@ export interface OrderItem {
   quantity: number;
 }
 
+export interface OrderAddress {
+  street: string;
+  city: string;
+  zip: string;
+}
+
 export interface Order {
   id: string;
   customerName: string;
+  address: OrderAddress;
   items: string[];
   orderItems: OrderItem[];
   total: number;
@@ -30,6 +37,7 @@ export interface Order {
 
 export interface CreateOrderInput {
   customerName: string;
+  address: OrderAddress;
   items: OrderItem[];
 }
 
@@ -66,6 +74,7 @@ export function createOrder(input: CreateOrderInput): Order {
   const order: Order = {
     id,
     customerName: input.customerName,
+    address: input.address,
     items: itemNames,
     orderItems: input.items,
     total,
@@ -79,10 +88,10 @@ export function createOrder(input: CreateOrderInput): Order {
 
 export function seedOrders(): void {
   const now = new Date().toISOString();
-  const samples: Array<{ customerName: string; items: string[]; orderItems: OrderItem[]; total: number; status: OrderStatus }> = [
-    { customerName: 'Alice', items: ['Latte x1', 'Croissant x1'], orderItems: [{ productId: 'latte', name: 'Latte', price: 4.50, quantity: 1 }, { productId: 'croissant', name: 'Croissant', price: 3.50, quantity: 1 }], total: 8.00, status: 'pending' },
-    { customerName: 'Bob', items: ['Espresso x1'], orderItems: [{ productId: 'espresso', name: 'Espresso', price: 3.00, quantity: 1 }], total: 3.00, status: 'confirmed' },
-    { customerName: 'Carol', items: ['Cappuccino x1', 'Muffin x1', 'Orange Juice x1'], orderItems: [{ productId: 'cappuccino', name: 'Cappuccino', price: 4.50, quantity: 1 }, { productId: 'muffin', name: 'Blueberry Muffin', price: 3.00, quantity: 1 }, { productId: 'orange-juice', name: 'Orange Juice', price: 4.00, quantity: 1 }], total: 11.50, status: 'delivering' },
+  const samples: Array<{ customerName: string; address: OrderAddress; items: string[]; orderItems: OrderItem[]; total: number; status: OrderStatus }> = [
+    { customerName: 'Alice', address: { street: '10 Maple Ave', city: 'Portland', zip: '97201' }, items: ['Latte x1', 'Croissant x1'], orderItems: [{ productId: 'latte', name: 'Latte', price: 4.50, quantity: 1 }, { productId: 'croissant', name: 'Croissant', price: 3.50, quantity: 1 }], total: 8.00, status: 'pending' },
+    { customerName: 'Bob', address: { street: '42 Oak St', city: 'Seattle', zip: '98101' }, items: ['Espresso x1'], orderItems: [{ productId: 'espresso', name: 'Espresso', price: 3.00, quantity: 1 }], total: 3.00, status: 'confirmed' },
+    { customerName: 'Carol', address: { street: '7 Pine Rd', city: 'Denver', zip: '80202' }, items: ['Cappuccino x1', 'Muffin x1', 'Orange Juice x1'], orderItems: [{ productId: 'cappuccino', name: 'Cappuccino', price: 4.50, quantity: 1 }, { productId: 'muffin', name: 'Blueberry Muffin', price: 3.00, quantity: 1 }, { productId: 'orange-juice', name: 'Orange Juice', price: 4.00, quantity: 1 }], total: 11.50, status: 'delivering' },
   ];
   for (const s of samples) {
     const id = uuidv4();

@@ -5,9 +5,19 @@ import {
   getAllOrders, getOrderById, updateOrderStatus, isValidStatus, seedOrders,
   getAllProducts, getProductById, createOrder,
 } from './store';
-import type { CreateOrderInput, OrderItem } from './store';
+import type { CreateOrderInput, OrderItem, OrderAddress } from './store';
 
 const logger = pino({ name: 'orders' });
+
+function isValidAddress(addr: unknown): addr is OrderAddress {
+  if (typeof addr !== 'object' || addr === null) return false;
+  const obj = addr as Record<string, unknown>;
+  return (
+    typeof obj['street'] === 'string' && obj['street'].trim().length > 0 &&
+    typeof obj['city'] === 'string' && obj['city'].trim().length > 0 &&
+    typeof obj['zip'] === 'string' && /^[A-Za-z0-9\s\-]{3,10}$/.test(obj['zip'].trim())
+  );
+}
 
 function isValidOrderItem(item: unknown): item is OrderItem {
   if (typeof item !== 'object' || item === null) return false;
@@ -60,10 +70,16 @@ export function createApp(): express.Application {
   app.post('/api/orders', (req, res) => {
     const body = req.body as Record<string, unknown>;
     const customerName = body['customerName'];
+    const address = body['address'];
     const items = body['items'];
 
     if (typeof customerName !== 'string' || customerName.trim().length === 0) {
       res.status(400).json({ error: 'Missing or empty "customerName"' });
+      return;
+    }
+
+    if (!isValidAddress(address)) {
+      res.status(400).json({ error: 'Missing or invalid "address" (requires street, city, and zip)' });
       return;
     }
 
@@ -84,8 +100,14 @@ export function createApp(): express.Application {
       }
     }
 
+    const validatedAddress = address as OrderAddress;
     const input: CreateOrderInput = {
       customerName: customerName.trim(),
+      address: {
+        street: validatedAddress.street.trim(),
+        city: validatedAddress.city.trim(),
+        zip: validatedAddress.zip.trim(),
+      },
       items: items as OrderItem[],
     };
 
