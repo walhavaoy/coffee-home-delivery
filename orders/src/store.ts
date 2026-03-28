@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'delivered' | 'cancelled';
 
@@ -24,6 +24,7 @@ export interface Order {
   orderItems: OrderItem[];
   total: number;
   status: OrderStatus;
+  estimatedDeliveryMin: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,8 +59,23 @@ export function getProductById(id: string): Product | undefined {
 
 const orders: Map<string, Order> = new Map();
 
+const DELIVERY_MIN = 30;
+const DELIVERY_MAX = 45;
+
+function generateOrderId(): string {
+  const hex = crypto.randomBytes(4).toString('hex').toUpperCase();
+  return `ORD-${hex}`;
+}
+
+function randomDeliveryEstimate(): number {
+  return DELIVERY_MIN + crypto.randomInt(DELIVERY_MAX - DELIVERY_MIN + 1);
+}
+
 export function createOrder(input: CreateOrderInput): Order {
-  const id = uuidv4();
+  let id = generateOrderId();
+  while (orders.has(id)) {
+    id = generateOrderId();
+  }
   const now = new Date().toISOString();
   const total = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemNames = input.items.map(i => `${i.name} x${i.quantity}`);
@@ -70,6 +86,7 @@ export function createOrder(input: CreateOrderInput): Order {
     orderItems: input.items,
     total,
     status: 'pending',
+    estimatedDeliveryMin: randomDeliveryEstimate(),
     createdAt: now,
     updatedAt: now,
   };
@@ -85,8 +102,11 @@ export function seedOrders(): void {
     { customerName: 'Carol', items: ['Cappuccino x1', 'Muffin x1', 'Orange Juice x1'], orderItems: [{ productId: 'cappuccino', name: 'Cappuccino', price: 4.50, quantity: 1 }, { productId: 'muffin', name: 'Blueberry Muffin', price: 3.00, quantity: 1 }, { productId: 'orange-juice', name: 'Orange Juice', price: 4.00, quantity: 1 }], total: 11.50, status: 'delivering' },
   ];
   for (const s of samples) {
-    const id = uuidv4();
-    orders.set(id, { id, ...s, createdAt: now, updatedAt: now });
+    let id = generateOrderId();
+    while (orders.has(id)) {
+      id = generateOrderId();
+    }
+    orders.set(id, { id, ...s, estimatedDeliveryMin: randomDeliveryEstimate(), createdAt: now, updatedAt: now });
   }
 }
 

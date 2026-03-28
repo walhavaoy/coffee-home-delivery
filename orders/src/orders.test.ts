@@ -22,9 +22,13 @@ describe('Orders API', () => {
       const res = await request(app).get('/api/orders');
       for (const order of res.body.orders) {
         expect(order).toHaveProperty('id');
+        expect(order.id).toMatch(/^ORD-[0-9A-F]{8}$/);
         expect(order).toHaveProperty('customerName');
         expect(order).toHaveProperty('items');
         expect(order).toHaveProperty('status');
+        expect(order).toHaveProperty('estimatedDeliveryMin');
+        expect(order.estimatedDeliveryMin).toBeGreaterThanOrEqual(30);
+        expect(order.estimatedDeliveryMin).toBeLessThanOrEqual(45);
         expect(order).toHaveProperty('createdAt');
         expect(order).toHaveProperty('updatedAt');
       }
@@ -130,9 +134,12 @@ describe('Orders API', () => {
         });
       expect(res.status).toBe(201);
       expect(res.body.order).toHaveProperty('id');
+      expect(res.body.order.id).toMatch(/^ORD-[0-9A-F]{8}$/);
       expect(res.body.order.customerName).toBe('Test User');
       expect(res.body.order.status).toBe('pending');
       expect(res.body.order.total).toBe(products[0].price * 2);
+      expect(res.body.order.estimatedDeliveryMin).toBeGreaterThanOrEqual(30);
+      expect(res.body.order.estimatedDeliveryMin).toBeLessThanOrEqual(45);
     });
 
     it('returns 400 for missing customerName', async () => {
