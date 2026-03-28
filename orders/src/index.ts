@@ -84,9 +84,14 @@ export function createApp(): express.Application {
       }
     }
 
+    const domain = typeof body['domain'] === 'string' && body['domain'].trim().length > 0
+      ? body['domain'].trim()
+      : undefined;
+
     const input: CreateOrderInput = {
       customerName: customerName.trim(),
       items: items as OrderItem[],
+      domain,
     };
 
     const order = createOrder(input);
