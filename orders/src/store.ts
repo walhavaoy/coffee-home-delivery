@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export type OrderStatus = 'new' | 'pending' | 'confirmed' | 'preparing' | 'delivering' | 'delivered' | 'cancelled';
+export type OrderStatus = 'new' | 'preparing' | 'delivered';
 
 export interface Product {
   id: string;
@@ -107,7 +107,7 @@ export function updateOrderStatus(id: string, status: OrderStatus): Order | unde
 }
 
 const validStatuses: ReadonlySet<string> = new Set<OrderStatus>([
-  'new', 'pending', 'confirmed', 'preparing', 'delivering', 'delivered', 'cancelled',
+  'new', 'preparing', 'delivered',
 ]);
 
 export function isValidStatus(value: unknown): value is OrderStatus {

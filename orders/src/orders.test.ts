@@ -37,9 +37,9 @@ describe('Orders API', () => {
       const target = orders[0];
       const res = await request(app)
         .patch(`/api/orders/${target.id}`)
-        .send({ status: 'confirmed' });
+        .send({ status: 'preparing' });
       expect(res.status).toBe(200);
-      expect(res.body.order.status).toBe('confirmed');
+      expect(res.body.order.status).toBe('preparing');
     });
 
     it('returns 400 for missing status', async () => {
@@ -62,7 +62,7 @@ describe('Orders API', () => {
     it('returns 404 for non-existent order', async () => {
       const res = await request(app)
         .patch('/api/orders/nonexistent-id')
-        .send({ status: 'confirmed' });
+        .send({ status: 'preparing' });
       expect(res.status).toBe(404);
     });
   });
