@@ -457,7 +457,7 @@ tr:hover td { background: var(--bg-hover); }
 <div class="main">
   <div class="error-banner" id="error-banner" role="alert" data-testid="admin-alert-error">
     <span id="error-message" data-testid="admin-text-errorMessage"></span>
-    <button class="error-dismiss" data-action="dismiss-error" aria-label="Dismiss error" tabindex="0">&times;</button>
+    <button class="error-dismiss" data-action="dismiss-error" data-testid="admin-button-dismissError" aria-label="Dismiss error" tabindex="0">&times;</button>
   </div>
 
   <div class="summary-cards" data-testid="admin-container-summary">
@@ -508,17 +508,17 @@ tr:hover td { background: var(--bg-hover); }
     <table data-testid="admin-table-orders" role="grid">
       <thead>
         <tr>
-          <th data-sort="id">Order ID <span class="sort-arrow"></span></th>
-          <th data-sort="customerName">Customer <span class="sort-arrow"></span></th>
-          <th>Items</th>
-          <th data-sort="status">Status <span class="sort-arrow"></span></th>
-          <th>Action</th>
-          <th data-sort="createdAt">Created <span class="sort-arrow"></span></th>
-          <th data-sort="updatedAt">Updated <span class="sort-arrow"></span></th>
+          <th data-sort="id" data-testid="admin-th-sortId">Order ID <span class="sort-arrow"></span></th>
+          <th data-sort="customerName" data-testid="admin-th-sortCustomerName">Customer <span class="sort-arrow"></span></th>
+          <th data-testid="admin-th-items">Items</th>
+          <th data-sort="status" data-testid="admin-th-sortStatus">Status <span class="sort-arrow"></span></th>
+          <th data-testid="admin-th-action">Action</th>
+          <th data-sort="createdAt" data-testid="admin-th-sortCreatedAt">Created <span class="sort-arrow"></span></th>
+          <th data-sort="updatedAt" data-testid="admin-th-sortUpdatedAt">Updated <span class="sort-arrow"></span></th>
         </tr>
       </thead>
       <tbody id="orders-body" data-testid="admin-container-ordersBody">
-        <tr class="empty-row"><td colspan="7"><div class="loading-state"><div class="spinner"></div><div>Loading orders...</div></div></td></tr>
+        <tr class="empty-row" data-testid="admin-row-loading"><td colspan="7"><div class="loading-state"><div class="spinner"></div><div>Loading orders...</div></div></td></tr>
       </tbody>
     </table>
   </div>
@@ -528,7 +528,7 @@ tr:hover td { background: var(--bg-hover); }
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" data-testid="admin-heading-modalTitle">Order Details</span>
-      <button class="modal-close" data-action="close-modal" aria-label="Close" tabindex="0">&times;</button>
+      <button class="modal-close" data-action="close-modal" data-testid="admin-button-closeModal" aria-label="Close" tabindex="0">&times;</button>
     </div>
     <div id="detail-body" data-testid="admin-container-modalBody"></div>
   </div>
@@ -628,7 +628,7 @@ tr:hover td { background: var(--bg-hover); }
     orderCountEl.textContent = 'Showing ' + filtered.length + ' of ' + allOrders.length;
 
     if (filtered.length === 0) {
-      tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No orders match the current filter.</td></tr>';
+      tbody.innerHTML = '<tr class="empty-row" data-testid="admin-row-empty"><td colspan="7">No orders match the current filter.</td></tr>';
       updateSortArrows();
       return;
     }
@@ -740,7 +740,7 @@ tr:hover td { background: var(--bg-hover); }
     var html = '<div class="detail-row"><span class="detail-label">Order ID</span><span class="detail-value" data-testid="admin-text-detailId">' + escapeHtml(order.id) + '</span></div>'
       + '<div class="detail-row"><span class="detail-label">Customer</span><span class="detail-value" data-testid="admin-text-detailCustomer">' + escapeHtml(order.customerName) + '</span></div>'
       + '<div class="detail-row"><span class="detail-label">Items</span><span class="detail-value" data-testid="admin-text-detailItems">' + (items || 'None') + '</span></div>'
-      + '<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="' + statusClass(order.status) + '">' + escapeHtml(order.status) + '</span></span></div>'
+      + '<div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" data-testid="admin-text-detailStatus"><span class="' + statusClass(order.status) + '">' + escapeHtml(order.status) + '</span></span></div>'
       + '<div class="detail-row"><span class="detail-label">Created</span><span class="detail-value" data-testid="admin-text-detailCreated">' + formatTime(order.createdAt) + '</span></div>'
       + '<div class="detail-row"><span class="detail-label">Updated</span><span class="detail-value" data-testid="admin-text-detailUpdated">' + formatTime(order.updatedAt) + '</span></div>';
 
