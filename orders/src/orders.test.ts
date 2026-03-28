@@ -27,6 +27,7 @@ describe('Orders API', () => {
         expect(order).toHaveProperty('status');
         expect(order).toHaveProperty('createdAt');
         expect(order).toHaveProperty('updatedAt');
+        expect(order).toHaveProperty('deliveryEstimate');
       }
     });
   });
@@ -133,6 +134,11 @@ describe('Orders API', () => {
       expect(res.body.order.customerName).toBe('Test User');
       expect(res.body.order.status).toBe('pending');
       expect(res.body.order.total).toBe(products[0].price * 2);
+      expect(res.body.order).toHaveProperty('deliveryEstimate');
+      const estimate = new Date(res.body.order.deliveryEstimate).getTime();
+      const created = new Date(res.body.order.createdAt).getTime();
+      expect(estimate).toBeGreaterThanOrEqual(created + 30 * 60 * 1000);
+      expect(estimate).toBeLessThanOrEqual(created + 45 * 60 * 1000);
     });
 
     it('returns 400 for missing customerName', async () => {

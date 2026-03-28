@@ -26,6 +26,7 @@ export interface Order {
   status: OrderStatus;
   createdAt: string;
   updatedAt: string;
+  deliveryEstimate: string;
 }
 
 export interface CreateOrderInput {
@@ -58,9 +59,15 @@ export function getProductById(id: string): Product | undefined {
 
 const orders: Map<string, Order> = new Map();
 
+function computeDeliveryEstimate(orderTime: Date): string {
+  const estimateMs = 30 * 60 * 1000 + Math.floor(Math.random() * 16) * 60 * 1000; // 30-45 min
+  return new Date(orderTime.getTime() + estimateMs).toISOString();
+}
+
 export function createOrder(input: CreateOrderInput): Order {
   const id = uuidv4();
-  const now = new Date().toISOString();
+  const now = new Date();
+  const nowIso = now.toISOString();
   const total = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemNames = input.items.map(i => `${i.name} x${i.quantity}`);
   const order: Order = {
@@ -70,8 +77,9 @@ export function createOrder(input: CreateOrderInput): Order {
     orderItems: input.items,
     total,
     status: 'pending',
-    createdAt: now,
-    updatedAt: now,
+    createdAt: nowIso,
+    updatedAt: nowIso,
+    deliveryEstimate: computeDeliveryEstimate(now),
   };
   orders.set(id, order);
   return order;
@@ -86,7 +94,8 @@ export function seedOrders(): void {
   ];
   for (const s of samples) {
     const id = uuidv4();
-    orders.set(id, { id, ...s, createdAt: now, updatedAt: now });
+    const estimate = computeDeliveryEstimate(new Date(now));
+    orders.set(id, { id, ...s, createdAt: now, updatedAt: now, deliveryEstimate: estimate });
   }
 }
 

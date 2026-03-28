@@ -848,6 +848,7 @@ body {
       + '<div class="confirmation-details" data-testid="shop-details-confirmation">'
       + '<div class="detail-row"><span class="label">Order ID</span><span class="value" data-testid="shop-text-confirmationOrderId">' + escapeHtml(order.id) + '</span></div>'
       + '<div class="detail-row"><span class="label">Status</span><span class="value">' + escapeHtml(order.status) + '</span></div>'
+      + '<div class="detail-row"><span class="label">Estimated Delivery</span><span class="value" data-testid="shop-text-confirmationDeliveryEstimate">' + escapeHtml(new Date(order.deliveryEstimate).toLocaleString()) + '</span></div>'
       + '<div class="detail-row"><span class="label">Placed</span><span class="value">' + escapeHtml(new Date(order.createdAt).toLocaleString()) + '</span></div>'
       + '<div class="detail-row total"><span class="label">Total</span><span class="value">' + escapeHtml(formatPrice(order.total)) + '</span></div>'
       + '<div class="confirmation-items"><h3>Items</h3>' + itemsHtml + '</div>'
