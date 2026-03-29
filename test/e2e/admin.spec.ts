@@ -3,8 +3,6 @@ import type { APIRequestContext } from '@playwright/test';
 
 interface OrderItem {
   productId: string;
-  name: string;
-  price: number;
   quantity: number;
 }
 
@@ -39,21 +37,21 @@ test.describe('Admin order management', () => {
     {
       customerName: 'Alice Admin',
       items: [
-        { productId: 'espresso', name: 'Espresso', price: 3.00, quantity: 2 },
-        { productId: 'croissant', name: 'Croissant', price: 3.50, quantity: 1 },
+        { productId: 'espresso', quantity: 2 },
+        { productId: 'croissant', quantity: 1 },
       ],
     },
     {
       customerName: 'Bob Builder',
       items: [
-        { productId: 'latte', name: 'Latte', price: 4.50, quantity: 1 },
-        { productId: 'muffin', name: 'Muffin', price: 3.00, quantity: 2 },
+        { productId: 'latte', quantity: 1 },
+        { productId: 'muffin', quantity: 2 },
       ],
     },
     {
       customerName: 'Charlie Chef',
       items: [
-        { productId: 'mocha', name: 'Mocha', price: 5.00, quantity: 1 },
+        { productId: 'mocha', quantity: 1 },
       ],
     },
   ];
