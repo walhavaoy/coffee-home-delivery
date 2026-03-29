@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects</title>
+<style>
+:root {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-hover: #334155;
+  --border: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-dim: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #22c55e;
+  --success-bg: rgba(34, 197, 94, 0.15);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.15);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.15);
+  --info: #3b82f6;
+  --info-bg: rgba(59, 130, 246, 0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  min-height: 100vh;
+}
+
+.header {
+  background: var(--bg-secondary);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.last-updated {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.refresh-btn {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.refresh-btn:hover,
+.refresh-btn:focus {
+  background: var(--accent);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 20rem 1fr;
+  gap: 1.5rem;
+}
+
+/* Error / Success banners */
+
+.error-banner {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: none;
+  grid-column: 1 / -1;
+}
+
+.error-banner.visible { display: block; }
+
+.success-banner {
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  color: var(--success);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: none;
+  grid-column: 1 / -1;
+}
+
+.success-banner.visible { display: block; }
+
+/* Project List */
+
+.project-list-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.panel-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--bg-primary);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.project-item:last-child { border-bottom: none; }
+
+.project-item:hover { background: var(--bg-hover); }
+
+.project-item.selected {
+  background: var(--bg-hover);
+  border-left: 2px solid var(--accent);
+}
+
+.project-item-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.project-item-desc {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-bottom: 0.375rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-status {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.project-status-active { background: var(--success-bg); color: var(--success); }
+.project-status-archived { background: var(--warning-bg); color: var(--warning); }
+.project-status-draft { background: var(--info-bg); color: var(--info); }
+
+.empty-state {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* Detail Panel */
+
+.detail-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  display: none;
+}
+
+.detail-panel.visible { display: block; }
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.detail-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.detail-description {
+  font-size: 0.875rem;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.detail-meta {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.5rem 0;
+}
+
+.detail-label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+.detail-value {
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
+  max-width: 65%;
+  word-break: break-all;
+}
+
+/* URL Section */
+
+.url-section {
+  margin-top: 0.5rem;
+}
+
+.url-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.url-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.url-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  word-break: break-all;
+}
+
+.url-link:hover { text-decoration: underline; }
+
+.url-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.8125rem;
+}
+
+/* Buttons */
+
+.btn {
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--text-primary);
+}
+
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-secondary {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) { background: var(--bg-primary); }
+
+/* URL Edit Form */
+
+.url-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.form-input {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-input::placeholder { color: var(--text-muted); }
+
+.form-group.invalid .form-input { border-color: var(--danger); }
+
+.form-error {
+  color: var(--danger);
+  font-size: 0.6875rem;
+}
+
+.url-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+/* No-selection state */
+
+.detail-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header" data-testid="projects-container-header">
+  <div class="header-left">
+    <h1 data-testid="projects-heading-title">Projects</h1>
+  </div>
+  <div class="header-right">
+    <span class="last-updated" id="lastUpdated" data-testid="projects-text-lastUpdated"></span>
+    <button class="refresh-btn" data-action="refresh" data-testid="projects-button-refresh" aria-label="Refresh projects" tabindex="0">Refresh</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="error-banner" id="errorBanner" role="alert" data-testid="projects-alert-error"></div>
+  <div class="success-banner" id="successBanner" role="status" data-testid="projects-alert-success"></div>
+
+  <div class="project-list-panel" data-testid="projects-container-list">
+    <div class="panel-title">All Projects</div>
+    <div id="projectList" data-testid="projects-container-projectList"></div>
+  </div>
+
+  <div class="detail-panel" id="detailPanel" data-testid="projects-container-detail">
+    <div id="detailBody" data-testid="projects-container-detailBody"></div>
+  </div>
+</div>
+
+<script src="ui/projects.js"></script>
+</body>
+</html>
