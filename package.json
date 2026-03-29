@@ -1,0 +1,12 @@
+{
+  "name": "@tmpclaw/e2e-tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "npx playwright test",
+    "test:e2e": "npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.0"
+  }
+}
