@@ -1,0 +1,20 @@
+apiVersion: tmpclaw.io/v1alpha1
+kind: ClawPlugin
+metadata:
+  name: meals-ui
+  labels:
+    app.kubernetes.io/managed-by: Helm
+spec:
+  label: Meals
+  order: 26
+  mode: tab
+  port: {{ .Values.port }}
+  service: meals-ui
+  bundlePath: /ui/meals.js
+  manifestPath: /ui/meals-manifest.json
+  apiProxy:
+    prefix: /api/meals-ui
+    targetService: taskmaster
+    targetPort: 8080
+    stripPrefix: /api/meals-ui
+    addPrefix: /api

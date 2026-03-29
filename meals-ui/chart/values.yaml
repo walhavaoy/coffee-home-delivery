@@ -1,0 +1,8 @@
+replicaCount: 1
+
+image:
+  repository: localhost:31500/tmpclaw/meals-ui
+  tag: latest
+  pullPolicy: Always
+
+port: 8080
