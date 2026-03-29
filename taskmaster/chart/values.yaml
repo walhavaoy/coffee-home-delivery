@@ -1,0 +1,5 @@
+image:
+  repository: localhost:31500/tmpclaw/taskmaster
+  tag: latest
+port: 8080
+replicaCount: 1

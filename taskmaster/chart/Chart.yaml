@@ -1,0 +1,4 @@
+apiVersion: v2
+name: tmpclaw-taskmaster
+version: 0.1.0
+description: Taskmaster meals CRUD API
