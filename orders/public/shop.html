@@ -557,9 +557,9 @@ body {
 </head>
 <body>
 
-<div class="header">
+<div class="header" data-testid="shop-container-header">
   <div class="header-left">
-    <h1>Coffee Home Delivery</h1>
+    <h1 data-testid="shop-heading-title">Coffee Home Delivery</h1>
     <div class="nav-tabs">
       <button class="nav-tab active" data-testid="shop-tab-catalogue" data-action="navigate" data-view="catalogue" aria-label="Browse catalogue">Menu</button>
       <button class="nav-tab" data-testid="shop-tab-cart" data-action="navigate" data-view="cart" aria-label="View cart">Cart</button>
@@ -578,11 +578,11 @@ body {
   <!-- CATALOGUE VIEW -->
   <div id="catalogueView" class="view active" data-testid="shop-view-catalogue">
     <div class="category-filter" data-testid="shop-filter-category">
-      <button class="filter-btn active" data-action="filter" data-category="all">All</button>
-      <button class="filter-btn" data-action="filter" data-category="coffee">Coffee</button>
-      <button class="filter-btn" data-action="filter" data-category="tea">Tea</button>
-      <button class="filter-btn" data-action="filter" data-category="bakery">Bakery</button>
-      <button class="filter-btn" data-action="filter" data-category="juice">Juice</button>
+      <button class="filter-btn active" data-action="filter" data-category="all" data-testid="shop-btn-filter-all">All</button>
+      <button class="filter-btn" data-action="filter" data-category="coffee" data-testid="shop-btn-filter-coffee">Coffee</button>
+      <button class="filter-btn" data-action="filter" data-category="tea" data-testid="shop-btn-filter-tea">Tea</button>
+      <button class="filter-btn" data-action="filter" data-category="bakery" data-testid="shop-btn-filter-bakery">Bakery</button>
+      <button class="filter-btn" data-action="filter" data-category="juice" data-testid="shop-btn-filter-juice">Juice</button>
     </div>
     <div class="product-grid" id="productGrid" data-testid="shop-grid-products"></div>
   </div>
@@ -773,7 +773,7 @@ body {
     }
 
     var html = '<table class="cart-table" data-testid="shop-table-cart">'
-      + '<thead><tr><th>Item</th><th>Price</th><th>Quantity</th><th>Total</th><th></th></tr></thead><tbody>';
+      + '<thead><tr><th data-testid="shop-th-item">Item</th><th data-testid="shop-th-price">Price</th><th data-testid="shop-th-quantity">Quantity</th><th data-testid="shop-th-total">Total</th><th></th></tr></thead><tbody>';
 
     for (var i = 0; i < cart.length; i++) {
       var item = cart[i];
@@ -783,7 +783,7 @@ body {
         + '<td><div class="qty-control">'
         + '<button class="qty-btn" data-action="updateQty" data-product-id="' + escapeHtml(item.productId) + '" data-delta="-1" '
         + 'data-testid="shop-btn-decrement-' + escapeHtml(item.productId) + '" aria-label="Decrease quantity">-</button>'
-        + '<span class="qty-value">' + item.quantity + '</span>'
+        + '<span class="qty-value" data-testid="shop-text-qty-' + escapeHtml(item.productId) + '">' + item.quantity + '</span>'
         + '<button class="qty-btn" data-action="updateQty" data-product-id="' + escapeHtml(item.productId) + '" data-delta="1" '
         + 'data-testid="shop-btn-increment-' + escapeHtml(item.productId) + '" aria-label="Increase quantity">+</button>'
         + '</div></td>'
@@ -795,8 +795,8 @@ body {
 
     html += '</tbody></table>';
     html += '<div class="cart-summary" data-testid="shop-summary-cart">'
-      + '<div class="cart-summary-row"><span>Items</span><span>' + getCartCount() + '</span></div>'
-      + '<div class="cart-summary-row total"><span>Total</span><span>' + escapeHtml(formatPrice(getCartTotal())) + '</span></div>'
+      + '<div class="cart-summary-row"><span>Items</span><span data-testid="shop-text-cartItemCount">' + getCartCount() + '</span></div>'
+      + '<div class="cart-summary-row total"><span>Total</span><span data-testid="shop-text-cartTotal">' + escapeHtml(formatPrice(getCartTotal())) + '</span></div>'
       + '<button class="checkout-btn" data-action="navigate" data-view="checkout" data-testid="shop-btn-checkout">Proceed to Checkout</button>'
       + '</div>';
 

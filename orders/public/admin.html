@@ -457,7 +457,7 @@ tr:hover td { background: var(--bg-hover); }
 <div class="main">
   <div class="error-banner" id="error-banner" role="alert" data-testid="admin-alert-error">
     <span id="error-message" data-testid="admin-text-errorMessage"></span>
-    <button class="error-dismiss" data-action="dismiss-error" aria-label="Dismiss error" tabindex="0">&times;</button>
+    <button class="error-dismiss" data-action="dismiss-error" data-testid="admin-button-dismissError" aria-label="Dismiss error" tabindex="0">&times;</button>
   </div>
 
   <div class="summary-cards" data-testid="admin-container-summary">
@@ -508,13 +508,13 @@ tr:hover td { background: var(--bg-hover); }
     <table data-testid="admin-table-orders" role="grid">
       <thead>
         <tr>
-          <th data-sort="id">Order ID <span class="sort-arrow"></span></th>
-          <th data-sort="customerName">Customer <span class="sort-arrow"></span></th>
-          <th>Items</th>
-          <th data-sort="status">Status <span class="sort-arrow"></span></th>
-          <th>Action</th>
-          <th data-sort="createdAt">Created <span class="sort-arrow"></span></th>
-          <th data-sort="updatedAt">Updated <span class="sort-arrow"></span></th>
+          <th data-sort="id" data-testid="admin-th-orderId">Order ID <span class="sort-arrow"></span></th>
+          <th data-sort="customerName" data-testid="admin-th-customer">Customer <span class="sort-arrow"></span></th>
+          <th data-testid="admin-th-items">Items</th>
+          <th data-sort="status" data-testid="admin-th-status">Status <span class="sort-arrow"></span></th>
+          <th data-testid="admin-th-action">Action</th>
+          <th data-sort="createdAt" data-testid="admin-th-created">Created <span class="sort-arrow"></span></th>
+          <th data-sort="updatedAt" data-testid="admin-th-updated">Updated <span class="sort-arrow"></span></th>
         </tr>
       </thead>
       <tbody id="orders-body" data-testid="admin-container-ordersBody">
@@ -528,7 +528,7 @@ tr:hover td { background: var(--bg-hover); }
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" data-testid="admin-heading-modalTitle">Order Details</span>
-      <button class="modal-close" data-action="close-modal" aria-label="Close" tabindex="0">&times;</button>
+      <button class="modal-close" data-action="close-modal" data-testid="admin-button-closeModal" aria-label="Close" tabindex="0">&times;</button>
     </div>
     <div id="detail-body" data-testid="admin-container-modalBody"></div>
   </div>
